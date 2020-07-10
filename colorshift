@@ -61,15 +61,8 @@ done
 #
 hex_addition() {
   : "${INITIAL/\#}"
-
   # Break up into RGBA
   ((r=16#${_:0:2},g=16#${_:2:2},b=16#${_:4:2},a=16#${_:6:2}))
-  #((r=${_:0:2},g=${_:2:2},b=${_:4:2},a=${_:6:2}))
-
-  echo "r: $r - $RED"
-  echo "g: $g - $GREEN"
-  echo "b: $b - $BLUE"
-  echo "a: $a - $ALPHA"
 
   # Do math
   [ "$LIMIT" == "1" ] && {
