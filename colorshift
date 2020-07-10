@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+RED=0
+BLUE=0
+GREEN=0
+ALPHA=0
+LIMIT=0
+declare INITIAL
+
+die() {
+  echo "${1:-usage : ${0##*/} [ options ] }" 2>&1
+  [ "$1" ] && exit 1
+  cat > /dev/stdout <<EOF
+${0} [ options ]
+
+  options:
+    -h | --help           show help
+    -l | --limit          limit color output from wrapping around
+    -r | --red <value>    modify red by <value>
+    -g | --green <value>  modify green by <value>
+    -b | --blue <value>   modify blue by <value>
+    -a | --alpha <value>  modify alpha by <value>
+EOF
+  exit 0
+}
+
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      die
+      ;;
+    -l|--limit)
+      LIMIT=1
+      ;;
+    -r|--red)
+      RED="$2"
+      shift
+      ;;
+    -g|--green)
+      GREEN="$2"
+      shift
+      ;;
+    -b|--blue)
+      BLUE="$2"
+      shift
+      ;;
+    -a|--alpha)
+      ALPHA="$2"
+      shift
+      ;;
+    *)
+      INITIAL="$1"
+      ;;
+  esac
+  shift
+done
+
+#
+# Todo: can we do this without convert from hex to dec and back?
+# Todo: need to add limit option
+#
+hex_addition() {
+  : "${INITIAL/\#}"
+
+  # Break up into RGBA
+  ((r=16#${_:0:2},g=16#${_:2:2},b=16#${_:4:2},a=16#${_:6:2}))
+  #((r=${_:0:2},g=${_:2:2},b=${_:4:2},a=${_:6:2}))
+
+  echo "r: $r - $RED"
+  echo "g: $g - $GREEN"
+  echo "b: $b - $BLUE"
+  echo "a: $a - $ALPHA"
+
+  # Do math
+  [ "$LIMIT" == "1" ] && {
+    r=$(printf "0x%02X" $(("$r" + 0x"$RED")))
+    g=$(printf "0x%02X" $(("$g" + 0x"$BLUE")))
+    b=$(printf "0x%02X" $(("$b" + 0x"$GREEN")))
+    a=$(printf "0x%02X" $(("$a" + 0x"$ALPHA")))
+    echo "r: $r"
+    if [ ${#r} -gt 4 ]; then
+      r="0xff"
+    fi
+    if [ ${#g} -gt 4 ]; then
+      g="0xff"
+    fi
+    if [ ${#b} -gt 4 ]; then
+      b="0xff"
+    fi
+    if [ ${#a} -gt 4 ]; then
+      a="0xff"
+    fi
+    echo "r: $r"
+  } || {
+    r=$(printf "0x%02X" $(("$r" + 0x"$RED"   % "0xff")))
+    g=$(printf "0x%02X" $(("$g" + 0x"$GREEN" % "0xff")))
+    b=$(printf "0x%02X" $(("$b" + 0x"$BLUE"  % "0xff")))
+    a=$(printf "0x%02X" $(("$a" + 0x"$ALPHA" % "0xff")))
+  }
+
+  # Print final output
+  echo "#${r/0x}${g/0x}${b/0x}${a/0x}"
+}
+
+hex_addition
