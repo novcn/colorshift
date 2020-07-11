@@ -37,3 +37,9 @@ Subtraction supported too
 λ colorshift -r -1 '#FF000000'
 #FE000000
 ```
+
+Invert a color - this ignores the alpha value
+``` bash
+λ colorshift -v '#000000de'                                                                                                                   prj/colorshift master
+#FFFFFFDE
+```

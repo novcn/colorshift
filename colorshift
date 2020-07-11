@@ -5,6 +5,7 @@ BLUE=0
 GREEN=0
 ALPHA=0
 LIMIT=0
+INVERT=0
 declare INITIAL
 
 die() {
@@ -20,6 +21,7 @@ die() {
     -g | --green <value>  modify green by <value>
     -b | --blue <value>   modify blue by <value>
     -a | --alpha <value>  modify alpha by <value>
+    -v | --invert         invert the would-be output (this operates after other modifications)
 EOF
   exit 0
 }
@@ -47,6 +49,9 @@ while [[ "$#" -gt 0 ]]; do
     -a|--alpha)
       ALPHA="$2"
       shift
+      ;;
+    -v|--invert)
+      INVERT=1
       ;;
     *)
       INITIAL="$1"
@@ -90,4 +95,28 @@ hex_addition() {
   echo "#${r/0x}${g/0x}${b/0x}${a/0x}"
 }
 
-hex_addition
+invert() {
+  color="${1:?}"
+  SHIFT_AMT=128
+  inter=$(("$color" - "$SHIFT_AMT"))
+  inter=$(("$inter" * -1))
+  printf "%02X" $(("$inter" + "$SHIFT_AMT" - 1))
+}
+
+# Invert each of the RGB values - this does not operate on αlpha
+hex_inversion() {
+  local initial=${1/\#}
+  # Break up into RGBA
+  ((r=16#${initial:0:2},g=16#${initial:2:2},b=16#${initial:4:2},a=16#${initial:6:2}))
+  r=$(invert "$r")
+  g=$(invert "$g")
+  b=$(invert "$b")
+  a=$(printf "%02X" "$a")
+
+  # Print final output
+  echo "#${r}${g}${b}${a}"
+}
+
+output=$(hex_addition)
+
+[ "$INVERT" == 1 ] && hex_inversion "$output"
