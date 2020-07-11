@@ -5,6 +5,7 @@ usage : colorshift [ options ]
 
   options:
     -h | --help           show help
+    --verbose             verbose logging
     -l | --limit          limit color output from wrapping around
     -r | --red <value>    modify red by <value>
     -g | --green <value>  modify green by <value>
