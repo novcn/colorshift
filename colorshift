@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+VERBOSE=0
 RED=0
 BLUE=0
 GREEN=0
@@ -7,6 +8,12 @@ ALPHA=0
 LIMIT=0
 INVERT=0
 declare INITIAL
+
+trace() {
+  [[ "$VERBOSE" == "1" ]] && {
+    echo -e " \\033[96m--> \\033[97m$*\\033[39m"
+  }
+}
 
 die() {
   echo "${1:-usage : ${0##*/} [ options ] }" 2>&1
@@ -16,6 +23,7 @@ die() {
 
   options:
     -h | --help           show help
+    --verbose             verbose output
     -l | --limit          limit color output from wrapping around
     -r | --red <value>    modify red by <value>
     -g | --green <value>  modify green by <value>
@@ -33,6 +41,9 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     -l|--limit)
       LIMIT=1
+      ;;
+    --verbose)
+      VERBOSE=1
       ;;
     -r|--red)
       RED="$2"
@@ -60,8 +71,17 @@ while [[ "$#" -gt 0 ]]; do
   shift
 done
 
+trace "Using options:"
+trace "LIMIT: $LIMIT"
+trace "INVERT: $INVERT"
+trace "INITIAL: $INITIAL"
+trace "RED: $RED"
+trace "BLUE: $BLUE"
+trace "GREEN: $GREEN"
+trace "ALPHA: $ALPHA"
+
 #
-hex_addition() {
+hex_arithmetic() {
   : "${INITIAL/\#}"
   # Break up into RGBA
   ((r=16#${_:0:2},g=16#${_:2:2},b=16#${_:4:2},a=16#${_:6:2}))
@@ -117,6 +137,8 @@ hex_inversion() {
   echo "#${r}${g}${b}${a}"
 }
 
-output=$(hex_addition)
+output=$(hex_arithmetic)
+
+trace "hex arithmetic output : $output"
 
 [ "$INVERT" == 1 ] && hex_inversion "$output"
