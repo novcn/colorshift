@@ -23,7 +23,7 @@ Simply add values to each color
 Wrap around arithmetic by default
 ``` bash
 λ › colorshift -r 1 '#FF000000'
-#100000000
+#10000000
 ```
 
 Limit option disables wrap-around 
