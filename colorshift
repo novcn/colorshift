@@ -11,7 +11,7 @@ die() {
   echo "${1:-usage : ${0##*/} [ options ] }" 2>&1
   [ "$1" ] && exit 1
   cat > /dev/stdout <<EOF
-${0} [ options ]
+  adjust hex color values
 
   options:
     -h | --help           show help
@@ -56,9 +56,6 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 #
-# Todo: can we do this without convert from hex to dec and back?
-# Todo: need to add limit option
-#
 hex_addition() {
   : "${INITIAL/\#}"
   # Break up into RGBA
@@ -70,25 +67,23 @@ hex_addition() {
     g=$(printf "0x%02X" $(("$g" + 0x"$BLUE")))
     b=$(printf "0x%02X" $(("$b" + 0x"$GREEN")))
     a=$(printf "0x%02X" $(("$a" + 0x"$ALPHA")))
-    echo "r: $r"
     if [ ${#r} -gt 4 ]; then
-      r="0xff"
+      r="0xFF"
     fi
     if [ ${#g} -gt 4 ]; then
-      g="0xff"
+      g="0xFF"
     fi
     if [ ${#b} -gt 4 ]; then
-      b="0xff"
+      b="0xFF"
     fi
     if [ ${#a} -gt 4 ]; then
-      a="0xff"
+      a="0xFF"
     fi
-    echo "r: $r"
   } || {
-    r=$(printf "0x%02X" $(("$r" + 0x"$RED"   % "0xff")))
-    g=$(printf "0x%02X" $(("$g" + 0x"$GREEN" % "0xff")))
-    b=$(printf "0x%02X" $(("$b" + 0x"$BLUE"  % "0xff")))
-    a=$(printf "0x%02X" $(("$a" + 0x"$ALPHA" % "0xff")))
+    r=$(printf "0x%02X" $(( $(("$r" + 0x"$RED"))   % "0x100")))
+    g=$(printf "0x%02X" $(( $(("$g" + 0x"$GREEN")) % "0x100")))
+    b=$(printf "0x%02X" $(( $(("$b" + 0x"$BLUE"))  % "0x100")))
+    a=$(printf "0x%02X" $(( $(("$a" + 0x"$ALPHA")) % "0x100")))
   }
 
   # Print final output
