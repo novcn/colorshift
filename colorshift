@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Globals
 VERBOSE=0
 RED=0
 BLUE=0
@@ -7,6 +8,7 @@ GREEN=0
 ALPHA=0
 LIMIT=0
 INVERT=0
+CONTAINS_ALPHA=0
 declare INITIAL
 
 trace() {
@@ -80,6 +82,8 @@ trace "BLUE: $BLUE"
 trace "GREEN: $GREEN"
 trace "ALPHA: $ALPHA"
 
+[ "${#INITIAL}" == 9 ] && CONTAINS_ALPHA=1
+
 #
 hex_arithmetic() {
   : "${INITIAL/\#}"
@@ -111,8 +115,9 @@ hex_arithmetic() {
     a=$(printf "0x%02X" $(( $(("$a" + 0x"$ALPHA")) % "0x100")))
   }
 
-  # Print final output
-  echo "#${r/0x}${g/0x}${b/0x}${a/0x}"
+  [ "$CONTAINS_ALPHA" == "1" ] \
+    && echo "#${r/0x}${g/0x}${b/0x}${a/0x}" \
+    || echo "#${r/0x}${g/0x}${b/0x}"
 }
 
 invert() {
@@ -134,7 +139,9 @@ hex_inversion() {
   a=$(printf "%02X" "$a")
 
   # Print final output
-  echo "#${r}${g}${b}${a}"
+  [ "$CONTAINS_ALPHA" == "1" ] \
+    && echo "#${r}${g}${b}${a}" \
+    || echo "#${r}${g}${b}"
 }
 
 output=$(hex_arithmetic)
