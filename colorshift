@@ -141,4 +141,4 @@ output=$(hex_arithmetic)
 
 trace "hex arithmetic output : $output"
 
-[ "$INVERT" == 1 ] && hex_inversion "$output"
+[ "$INVERT" == 1 ] && hex_inversion "$output" || echo "$output"
